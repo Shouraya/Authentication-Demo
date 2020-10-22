@@ -38,7 +38,7 @@ app.get("/", function(req, res){
     res.render('home');
 });
 
-app.get("/secret", function(req,res){
+app.get("/secret", isLoggedIn, function(req,res){
     res.render("secret");
 });
 
@@ -79,6 +79,23 @@ app.post("/login", passport.authenticate("local",{
 }) ,function(req, res){
     //leave empty for now
 });
+
+//++++++++++
+//LOGOUT
+//++++++++++
+app.get('/logout', function(req, res){
+    req.logout();
+    res.redirect("/");
+});
+
+
+//MIDDLEWARE
+function isLoggedIn(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    } 
+    res.redirect("/login");
+}
 
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function(){
