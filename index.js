@@ -16,6 +16,7 @@ mongoose.connect("mongodb://localhost/auth_demo", {
 
 const app = express();
 app.set("view engine", 'ejs');
+app.use(bodyParser.urlencoded({extended:true}));
 app.use(require("express-session")({
     secret : process.env.SECRET,
     resave: false,
@@ -29,13 +30,39 @@ app.use(passport.session());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-
+//++++++++++++++
+//ROUTES
+//++++++++++++++
 app.get("/", function(req, res){
     res.render('home');
 });
 
 app.get("/secret", function(req,res){
     res.render("secret");
+});
+
+//+++++++++++++++++++
+//AUTH ROUTES
+//+++++++++++++++++++
+
+//Show Sign Up Form
+app.get("/register", function(req, res){
+    res.render("register");
+});
+
+app.post("/register", function(req, res){
+    req.body.username
+    req.body.password
+    User.register(new User({username: req.body.username}), req.body.password, function(err, user){
+        if(err){
+            console.log(err);
+            res.render('register');
+        } else {
+            passport.authenticate("local")(req, res, function(){
+                res.redirect("/secret");
+            });
+        }
+    });
 });
 
 var PORT = process.env.PORT || 3000;
